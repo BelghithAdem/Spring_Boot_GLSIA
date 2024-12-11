@@ -1,18 +1,18 @@
 package com.BeeOranized.BeeOranized.services;
 
 import com.BeeOranized.BeeOranized.Dtos.ApiResponsee;
+import com.BeeOranized.BeeOranized.Dtos.SignupRequestDto;
 import com.BeeOranized.BeeOranized.Dtos.UserDataDTO;
-import com.BeeOranized.BeeOranized.Entity.User;
-import com.BeeOranized.BeeOranized.Repository.UserRepository;
+import com.BeeOranized.BeeOranized.Entity.*;
+import com.BeeOranized.BeeOranized.Repository.*;
 import com.BeeOranized.BeeOranized.Security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class UserService {
@@ -26,6 +26,16 @@ public class UserService {
     private EmailService emailService;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private  RoleRepository roleRepository;
+    @Autowired
+    private  MembreRepository membreRepository;
+    @Autowired
+    private  ChefScrumRepository chefScrumRepository;
+    @Autowired
+    private  AdminRepository adminRepository;
+
 
     public List<User> getAllUser() {
         return userRepository.findAll();
@@ -115,5 +125,74 @@ public class UserService {
             return nameParts;
         }
     }
+
+
+    public String registerUser(SignupRequestDto signUpRequest, Model model) {
+        try {
+            if (userRepository.existsByUserEmail(signUpRequest.getUserEmail())) {
+                model.addAttribute("message", "Erreur : L'email est déjà pris !");
+                return "register";
+            }
+
+            Set<Role> roles = new HashSet<>();
+            Role userRole = assignUserRole(signUpRequest.getUserRole(), model);
+            if (userRole == null) {
+                return "register";
+            }
+
+            roles.add(userRole);
+
+            User newUser = createUser(signUpRequest, roles);
+
+            model.addAttribute("message", "Utilisateur enregistré avec succès !");
+            return "login";
+
+        } catch (Exception e) {
+            model.addAttribute("message", "Une erreur inattendue s'est produite. Veuillez réessayer.");
+            return "register";
+        }
+    }
+
+    private Role assignUserRole(String userRoleStr, Model model) {
+        Optional<Role> roleOpt;
+        switch (userRoleStr) {
+            case "Membre_ROLE":
+                roleOpt = roleRepository.findByName(ERole.Membre_ROLE);
+                break;
+            case "ChefScrum_ROLE":
+                roleOpt = roleRepository.findByName(ERole.ChefScrum_ROLE);
+                break;
+            case "ADMIN_ROLE":
+                roleOpt = roleRepository.findByName(ERole.ADMIN_ROLE);
+                break;
+            default:
+                model.addAttribute("message", "Erreur : Rôle invalide !");
+                return null;
+        }
+        return roleOpt.orElseGet(() -> roleRepository.save(new Role(ERole.valueOf(userRoleStr))));
+    }
+
+    private User createUser(SignupRequestDto signUpRequest, Set<Role> roles) {
+        String encodedPassword = encoder.encode(signUpRequest.getUserPassword());
+
+        switch (signUpRequest.getUserRole()) {
+            case "Membre_ROLE":
+                Membre membre = new Membre(signUpRequest.getName(), signUpRequest.getUserEmail(),
+                        encodedPassword, signUpRequest.getUserCity(), roles);
+                return membreRepository.save(membre);
+            case "ChefScrum_ROLE":
+                ChefScrum chefScrum = new ChefScrum(signUpRequest.getName(), signUpRequest.getUserEmail(),
+                        encodedPassword, signUpRequest.getUserCity(), roles);
+                return chefScrumRepository.save(chefScrum);
+            case "ADMIN_ROLE":
+                Admin admin = new Admin(signUpRequest.getName(), signUpRequest.getUserEmail(),
+                        encodedPassword, signUpRequest.getUserCity(), roles);
+                return adminRepository.save(admin);
+            default:
+                throw new IllegalArgumentException("Invalid role provided.");
+        }
+    }
+
+
 
 }

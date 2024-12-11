@@ -1,126 +1,97 @@
 package com.BeeOranized.BeeOranized.ControllerVue;
 
-import java.util.*;
-
+import com.BeeOranized.BeeOranized.Dtos.JwtResponseDto;
+import com.BeeOranized.BeeOranized.Dtos.LoginRequestDto;
+import com.BeeOranized.BeeOranized.Dtos.SignupRequestDto;
+import com.BeeOranized.BeeOranized.Securit.service.UserDetailsImpl;
+import com.BeeOranized.BeeOranized.Security.jwt.JwtUtils;
 import com.BeeOranized.BeeOranized.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.BeeOranized.BeeOranized.Dtos.SignupRequestDto;
-import com.BeeOranized.BeeOranized.Entity.*;
-import com.BeeOranized.BeeOranized.Repository.*;
-import com.BeeOranized.BeeOranized.services.EmailService;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/auth")
 public class AuthControllerVue {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PasswordEncoder encoder;
+    private final UserService userService;
 
     @Autowired
-    private MembreRepository membreRepository;
-    @Autowired
-    private ChefScrumRepository chefScrumRepository;
-    @Autowired
-    private AdminRepository adminRepository;
+    private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtUtils jwtUtils;
 
-    @GetMapping("/example")
-    public String getExample() {
-        return "register";
+    @Autowired
+    public AuthControllerVue(UserService userService) {
+        this.userService = userService;
     }
-    @GetMapping("/signupVue")
-    public String registerUser(@ModelAttribute SignupRequestDto signUpRequest, Model model) {
+
+    // Authentifier l'utilisateur et renvoyer une réponse JWT
+    @PostMapping("/signinVue")
+    public String authenticateUser(@ModelAttribute LoginRequestDto loginRequest, Model model) {
         try {
-            if (userRepository.existsByUserEmail(signUpRequest.getUserEmail())) {
-                model.addAttribute("message", "Erreur : L'email est déjà pris !");
-                return "register"; // Redirect to the registration page with error message
-            }
+            System.out.println("Authenticating user: " + loginRequest.getUserEmail());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUserEmail(), loginRequest.getUserPassword()));
 
-            Set<Role> roles = new HashSet<>();
-            Role userRole = assignUserRole(signUpRequest.getUserRole(), model);
-            if (userRole == null) {
-                return "register"; // Return if role is invalid
-            }
+            System.out.println("Authentication successful");
 
-            roles.add(userRole);
+            // Enregistrement de l'authentification dans le contexte de sécurité
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-            User newUser = createUser(signUpRequest, roles);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-            sendAccountEmail(newUser, signUpRequest.getUserPassword());
+            // Ajouter les données à la vue
+            model.addAttribute("userEmail", loginRequest.getUserEmail());
+            model.addAttribute("roles", roles);
+            model.addAttribute("jwt", jwt);
 
-            model.addAttribute("message", "Utilisateur enregistré avec succès !");
-            return "signupSuccess"; // Redirect to the success page
+            // Rediriger vers le template "login" après une authentification réussie
+            return "login"; // Vous pouvez ici rediriger vers une page après authentification
 
         } catch (Exception e) {
-            return "register"; // Redirect to the registration page with error message
+            e.printStackTrace(); // Affiche l'exception complète dans les logs
+            model.addAttribute("error", "Invalid email or password");
+
+            // Retourner à la page de connexion avec un message d'erreur
+            return "login"; // Afficher la vue de connexion avec l'erreur
         }
     }
 
-    private Role assignUserRole(String userRoleStr, Model model) {
-        Optional<Role> roleOpt;
-        switch (userRoleStr) {
-            case "Membre_ROLE":
-                roleOpt = roleRepository.findByName(ERole.Membre_ROLE);
-                break;
-            case "ChefScrum_ROLE":
-                roleOpt = roleRepository.findByName(ERole.ChefScrum_ROLE);
-                break;
-            case "ADMIN_ROLE":
-                roleOpt = roleRepository.findByName(ERole.ADMIN_ROLE);
-                break;
-            default:
-                model.addAttribute("message", "Erreur : Rôle invalide !");
-                return null; // Return null if role is invalid
-        }
-        return roleOpt.orElseGet(() -> roleRepository.save(new Role(ERole.valueOf(userRoleStr))));
+    // Inscription de l'utilisateur via le service
+    @PostMapping("/signupVue")
+    public String registerUser(@ModelAttribute SignupRequestDto signUpRequest, Model model) {
+        return userService.registerUser(signUpRequest, model);
     }
-
-    private User createUser(SignupRequestDto signUpRequest, Set<Role> roles) {
-        User newUser;
-        String encodedPassword = encoder.encode(signUpRequest.getUserPassword());
-
-        switch (signUpRequest.getUserRole()) {
-            case "Membre_ROLE":
-                Membre membre = new Membre(signUpRequest.getName(), signUpRequest.getUserEmail(),
-                        encodedPassword, signUpRequest.getUserCity(), roles);
-                newUser = membreRepository.save(membre);
-                break;
-            case "ChefScrum_ROLE":
-                ChefScrum chefScrum = new ChefScrum(signUpRequest.getName(), signUpRequest.getUserEmail(),
-                        encodedPassword, signUpRequest.getUserCity(), roles);
-                newUser = chefScrumRepository.save(chefScrum);
-                break;
-            case "ADMIN_ROLE":
-                Admin admin = new Admin(signUpRequest.getName(), signUpRequest.getUserEmail(),
-                        encodedPassword, signUpRequest.getUserCity(), roles);
-                newUser = adminRepository.save(admin);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid role provided.");
+    @PostMapping("/logoutVue")
+    public String logout(Model model) {
+        // Supprimer l'authentification du contexte de sécurité
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            // Réinitialiser le contexte de sécurité (déconnexion)
+            SecurityContextHolder.clearContext();
         }
-        return newUser;
-    }
 
-    private void sendAccountEmail(User user, String password) {
-        String subject = "Account Created";
-        String message = "Dear User,\n\nYour account has been created successfully.\n\n\n\n" +
-                "Please login to your account using the following credentials:\n\n" +
-                "<strong>Email:</strong> <u>" + user.getUserEmail() + "</u>\n\n" +
-                "<strong>Password:</strong> <u>" + password + "</u>\n\n" +
-                "Regards,\nYour Team";
-        emailService.sendEmail(user.getUserEmail(), subject, message);
+        // Rediriger vers la page de connexion après déconnexion
+        model.addAttribute("message", "Successfully logged out.");
+        return "login"; // Retourne à la page de connexion
+    }
+    // Exemple pour tester l'interface utilisateur
+    @GetMapping("/example")
+    public String getExample() {
+        return "register"; // Nom de la vue
     }
 }
