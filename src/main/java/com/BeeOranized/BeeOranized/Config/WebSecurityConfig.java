@@ -47,6 +47,8 @@ public class WebSecurityConfig {
                 .antMatchers("/project/**", "/task/**", "/users/**", "/except/**", "/conversation/**", "/email/**",
                         "/stomp-endpoint/**").permitAll()
                 .antMatchers("/**").permitAll()
+                .antMatchers("/signupVue").permitAll()
+                .antMatchers("/signinVue").permitAll()
                 .antMatchers("/error").permitAll()
                 .antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()

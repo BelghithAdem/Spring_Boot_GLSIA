@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -24,11 +25,18 @@ public class Project {
     private Long id;
     private String title;
     private String description;
+
     private String scrumMaster;
+
     @ElementCollection
     private List<String> assignedUsers = new ArrayList<>();
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
     @Enumerated(EnumType.STRING)
     private projectStatus status;
     @JsonManagedReference

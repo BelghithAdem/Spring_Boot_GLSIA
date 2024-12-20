@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Modification Utilisateur</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="h-screen flex">
+
+<!-- Sidebar -->
+<aside class="w-64 bg-blue-700 text-white flex flex-col shadow-lg">
+    <div class="p-6 text-center border-b border-blue-600">
+        <h1 class="text-2xl font-bold">Gestion App</h1>
+    </div>
+    <nav class="flex-1 p-4 space-y-4">
+        <a href="/listuser" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
+            <span class="material-icons-outlined mr-2"></span> Gestion des Utilisateurs
+        </a>
+        <a href="/projects" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
+            <span class="material-icons-outlined mr-2"></span> Gestion des Projets
+        </a>
+        <a href="/tasks" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
+            <span class="material-icons-outlined mr-2"></span> Gestion des Tâches
+        </a>
+    </nav>
+</aside>
+
+<!-- Main Content -->
+<div class="flex-1 flex items-center justify-center p-6">
+    <div class="w-full max-w-lg shadow-lg rounded-lg p-8 space-y-6">
+        <h2 class="text-2xl font-bold text-center text-gray-800">Modifier un Utilisateur</h2>
+
+        <!-- Formulaire -->
+        <form th:action="@{/updateUser/{id}(id=${user.userId})}" th:object="${user}" method="post" class="space-y-5">
+            <div>
+                <label for="userEmail" class="block mb-1 text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="userEmail" th:field="*{userEmail}" placeholder="Ex. exemple@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200" required />
+            </div>
+            <div>
+                <label for="name" class="mb-1 block text-sm font-medium text-gray-700">Nom Complet</label>
+                <input type="text" id="name" th:field="*{name}" placeholder="Ex. Jean Dupont" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200" required />
+            </div>
+            <div>
+                <label for="userPassword" class="mb-1 block text-sm font-medium text-gray-700">Mot de Passe</label>
+                <input type="text" id="userPassword" th:value="*{userPassword}" placeholder="Mot de Passe (non modifiable)" class="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-100 text-gray-500" readonly />
+            </div>
+            <div>
+                <label for="userCity" class="mb-1 block text-sm font-medium text-gray-700">Ville</label>
+                <input type="text" id="userCity" th:field="*{userCity}" placeholder="Ex. Paris" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200" required />
+            </div>
+            <div>
+                <label for="userRole" class="mb-1 block text-sm font-medium text-gray-700">Rôle</label>
+                <select id="userRole" name="userRole" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200" required>
+                    <option value="Membre_ROLE">Membre</option>
+                    <option value="ChefScrum_ROLE">Chef Scrum</option>
+                    <option value="ADMIN_ROLE">Admin</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition">Mettre à jour</button>
+
+            <p class="text-center text-sm text-gray-500">
+                 <a href="/listuser" class="text-blue-500 hover:underline">Retour A la liste</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

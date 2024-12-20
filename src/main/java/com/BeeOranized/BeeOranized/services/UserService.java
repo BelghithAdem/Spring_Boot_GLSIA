@@ -37,9 +37,6 @@ public class UserService {
     private  AdminRepository adminRepository;
 
 
-    public List<User> getAllUser() {
-        return userRepository.findAll();
-    }
 
     public String generateResetPasswordToken(User user) {
         User existingUser = userRepository.findByUserEmail(user.getUserEmail()).orElse(null);
@@ -126,7 +123,28 @@ public class UserService {
         }
     }
 
+    public User updateUser(Long id, User userDetails) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        user.setName(userDetails.getName());
+        user.setUserEmail(userDetails.getUserEmail());
+        user.setName(userDetails.getName());
+        user.setUserPassword(userDetails.getUserPassword());
+        user.setUserCity(userDetails.getUserCity());
+        user.setRoles(userDetails.getRoles());
+        return userRepository.save(user);
+    }
+    public List<User> getAllScrumMasters() {
+        // Find the role for ChefScrum_ROLE
+        Optional<Role> chefScrumRoleOpt = roleRepository.findByName(ERole.ChefScrum_ROLE);
 
+        // If the role exists, fetch all users who have this role
+        if (chefScrumRoleOpt.isPresent()) {
+            Role chefScrumRole = chefScrumRoleOpt.get();
+            return userRepository.findByRolesContaining(chefScrumRole); // Assuming the `UserRepository` has this method
+        } else {
+            return Collections.emptyList(); // Return an empty list if the role doesn't exist
+        }
+    }
     public String registerUser(SignupRequestDto signUpRequest, Model model) {
         try {
             if (userRepository.existsByUserEmail(signUpRequest.getUserEmail())) {
@@ -152,6 +170,33 @@ public class UserService {
             return "register";
         }
     }
+
+    public String addUser(SignupRequestDto signUpRequest, Model model) {
+        try {
+            if (userRepository.existsByUserEmail(signUpRequest.getUserEmail())) {
+                model.addAttribute("message", "Erreur : L'email est déjà pris !");
+                return "admin/register";
+            }
+
+            Set<Role> roles = new HashSet<>();
+            Role userRole = assignUserRole(signUpRequest.getUserRole(), model);
+            if (userRole == null) {
+                return "admin/register";
+            }
+
+            roles.add(userRole);
+
+            User newUser = createUser(signUpRequest, roles);
+
+            model.addAttribute("message", "Utilisateur enregistré avec succès !");
+            return "listuser";
+
+        } catch (Exception e) {
+            model.addAttribute("message", "Une erreur inattendue s'est produite. Veuillez réessayer.");
+            return "admin/register";
+        }
+    }
+
 
     private Role assignUserRole(String userRoleStr, Model model) {
         Optional<Role> roleOpt;
