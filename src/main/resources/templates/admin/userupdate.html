@@ -20,7 +20,7 @@
         <a href="/projects" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
             <span class="material-icons-outlined mr-2"></span> Gestion des Projets
         </a>
-        <a href="/tasks" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
+        <a href="/tasklist" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
             <span class="material-icons-outlined mr-2"></span> Gestion des Tâches
         </a>
     </nav>
@@ -50,14 +50,13 @@
                 <input type="text" id="userCity" th:field="*{userCity}" placeholder="Ex. Paris" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200" required />
             </div>
             <div>
-                <label for="userRole" class="mb-1 block text-sm font-medium text-gray-700">Rôle</label>
-                <select id="userRole" name="userRole" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200" required>
+                <label for="userRole" class="block text-sm font-medium text-gray-700">Rôle</label>
+                <select id="userRole" name="userRole" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required>
                     <option value="Membre_ROLE">Membre</option>
                     <option value="ChefScrum_ROLE">Chef Scrum</option>
                     <option value="ADMIN_ROLE">Admin</option>
                 </select>
             </div>
-
             <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition">Mettre à jour</button>
 
             <p class="text-center text-sm text-gray-500">

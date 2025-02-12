@@ -1,5 +1,4 @@
 package com.BeeOranized.BeeOranized.ControllerVue;
-
 import com.BeeOranized.BeeOranized.Dtos.JwtResponseDto;
 import com.BeeOranized.BeeOranized.Dtos.LoginRequestDto;
 import com.BeeOranized.BeeOranized.Dtos.SignupRequestDto;
@@ -67,7 +66,7 @@ public class AuthControllerVue {
             System.out.println("User roles: " + roles.contains("ROLE_ADMIN"));
             // Rediriger vers le template "login" après une authentification réussie
             if (roles.contains("ADMIN_ROLE")) {
-                return "/admin/index";  // Rediriger vers la page Admin
+                return "redirect:/listuser";
             } else if (roles.contains("ChefScrum_ROLE")) {
                 return "scrummaster/index";  // Rediriger vers la page Scrum Master
             } else if (roles.contains("Membre_ROLE")) {
@@ -91,10 +90,7 @@ public class AuthControllerVue {
         return userService.registerUser(signUpRequest, model);
     }
 
-    @RequestMapping("/addUser")
-    public String addUser(@ModelAttribute SignupRequestDto signUpRequest, Model model) {
-        return userService.addUser(signUpRequest, model);
-    }
+
     @RequestMapping("/logoutVue")
     public String logout(Model model) {
         // Supprimer l'authentification du contexte de sécurité
@@ -132,7 +128,7 @@ public class AuthControllerVue {
     public String updateUser(@PathVariable("id") Long id, @ModelAttribute("user") User user) {
         // Assuming the updateUser method is available in the userService.
         userService.updateUser(id, user);
-        return "redirect:/admin/userlist";  // Redirect to user list after updating
+        return "redirect:/listuser";  // Redirect to user list after updating
     }
 
     // Edit User Form
@@ -151,3 +147,4 @@ public class AuthControllerVue {
 
 
 }
+

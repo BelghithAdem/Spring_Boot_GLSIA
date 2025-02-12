@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Ajouter une Tâche</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="w-64 bg-blue-600 text-white h-auto flex flex-col shadow-lg">
+    <div class="p-6 text-center border-b border-blue-500">
+        <h1 class="text-2xl font-bold">Gestion App</h1>
+    </div>
+    <nav class="flex-1 p-4 space-y-4">
+        <a href="/listuser" class="block p-2 rounded hover:bg-blue-500 transition">
+            Gestion des Utilisateurs
+        </a>
+        <a href="/projectList" class="block p-2 rounded hover:bg-blue-500 transition">
+            Gestion des Projets
+        </a>
+        <a href="/tasklist" class="block p-2 rounded hover:bg-blue-500 transition">
+            Gestion des Tâches
+        </a>
+    </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-1 bg-white p-8">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-gray-800">Ajouter une Nouvelle Tâche</h1>
+        <form th:action="@{/tasktVue}" th:object="${task}" method="POST" class="space-y-6">
+
+            <!-- Title -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700">
+                    Titre <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="title" th:field="*{title}" required
+                       class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">
+                    Description
+                </label>
+                <textarea id="description" th:field="*{description}" rows="4"
+                          class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+
+            <!-- Assigned User -->
+            <div>
+                <label for="assignedUser" class="block text-sm font-medium text-gray-700">
+                    Assignée à
+                </label>
+                <select id="assignedUser" th:field="*{assignedUser}"
+                        class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled selected>Choisissez un Membre</option>
+                    <option th:each="master : ${members}" th:value="${master.getUserId()}" th:text="${master.getName()}"></option>
+                </select>
+            </div>
+
+            <!-- Start Date -->
+            <div>
+                <label for="startDate" class="block text-sm font-medium text-gray-700">
+                    Date d'Échéance <span class="text-red-500">*</span>
+                </label>
+                <input type="date" id="startDate" th:field="*{startDate}" required
+                       class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <!-- End Date -->
+            <div>
+                <label for="endDate" class="block text-sm font-medium text-gray-700">
+                    Date de Fin <span class="text-red-500">*</span>
+                </label>
+                <input type="date" id="endDate" th:field="*{endDate}" required
+                       class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">
+                    Statut
+                </label>
+                <select id="status" th:field="*{status}"
+                        class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="PENDING" selected>PENDING</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="BLOQUED">BLOQUED</option>
+                    <option value="FINISHED">FINISHED</option>
+                </select>
+            </div>
+
+            <!-- Project -->
+            <div>
+                <label for="project" class="block text-sm font-medium text-gray-700">
+                    Projet
+                </label>
+                <select id="project" th:field="*{project}"
+                        class="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled selected>Choisissez un Projet</option>
+                    <option th:each="projet : ${project}" th:value="${projet.getId()}" th:text="${projet.getTitle()}"></option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Ajouter Tâche
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

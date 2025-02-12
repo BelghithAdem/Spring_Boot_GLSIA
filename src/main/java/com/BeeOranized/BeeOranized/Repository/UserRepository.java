@@ -14,12 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByUserEmail(String userEmail);
 
-    Optional<User> findByResetPasswordToken(String resetPasswordToken);
 
     List<User> findByRolesContaining(Role role);
-
-
-    @Query("SELECT u FROM User u WHERE u.userId != :userId")
-    List<User> findAllExceptUser(@Param("userId") Long userId);
 
 }

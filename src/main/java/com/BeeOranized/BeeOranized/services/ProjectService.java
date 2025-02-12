@@ -5,8 +5,10 @@ import com.BeeOranized.BeeOranized.Repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectService {
@@ -18,18 +20,12 @@ public class ProjectService {
     @Transactional
     public Project createProject(Project project) {
         Project createdProject = projectRepository.save(project);
-
-        // Send email notification to assigned users
         sendProjectNotification(createdProject);
-
         return createdProject;
     }
 
     private void sendProjectNotification(Project project) {
-        // Fetch assigned users' email addresses from the project entity
         List<String> assignedUsers = project.getAssignedUsers();
-
-        // Prepare email content
         String subject = "New Project Created: " + project.getTitle();
         String message = "Dear User,\n\nA new project has been created: " + "<strong>" + project.getTitle()
                 + "</strong>" +
@@ -38,8 +34,6 @@ public class ProjectService {
                 + project.getStartDate() +
                 "</strong>" + "\nEnd Date: " + "<strong>" + project.getEndDate() + "</strong>"
                 + "\n\nRegards,\nYour Team";
-
-        // Send email to each assigned user
         for (String userEmail : assignedUsers) {
             emailService.sendEmail(userEmail, subject, message);
         }
@@ -53,21 +47,9 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-    public Project updateProject(Project project) {
-        return projectRepository.save(project);
-    }
 
     public void deleteProject(Long id) {
         projectRepository.deleteById(id);
-    }
-
-    /*
-     * public List<Project> getProjectsByUser(String user){
-     * return projectRepository.findByAssignedUsersContaining(user);
-     * }
-     */
-    public List<Project> getProjectsByUserorScrumMaster(String assignedUsers, String scrumMaster) {
-        return projectRepository.findByAssignedUsersContainingOrScrumMaster(assignedUsers, scrumMaster);
     }
 
     public List<Project> getProjectsByAssignedUsers(String assignedUsers) {
@@ -79,8 +61,19 @@ public class ProjectService {
     }
 
     public Project updateProjectbyid(Long id, Project project) {
-        project.setId(id);
-        return projectRepository.save(project);
+        Optional<Project> existingProjectOptional = projectRepository.findById(id);
+        if (existingProjectOptional.isPresent()) {
+            Project existingProject = existingProjectOptional.get();
+            existingProject.setTitle(project.getTitle());
+            existingProject.setDescription(project.getDescription());
+            existingProject.setScrumMaster(project.getScrumMaster());
+            existingProject.setStartDate(project.getStartDate());
+            existingProject.setEndDate(project.getEndDate());
+            existingProject.setStatus(project.getStatus());
+            return projectRepository.save(existingProject);
+        } else {
+            throw new EntityNotFoundException("Le projet avec l'ID " + id + " n'existe pas.");
+        }
     }
 
     public Project getProjectById(Long id) {

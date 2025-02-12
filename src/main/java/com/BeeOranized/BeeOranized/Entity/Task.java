@@ -3,6 +3,7 @@ package com.BeeOranized.BeeOranized.Entity;
 import com.BeeOranized.BeeOranized.enums.taskStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -20,7 +21,11 @@ public class Task {
     private String title;
     private String description;
     private String assignedUser;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     @Enumerated(EnumType.STRING)
     private taskStatus status;

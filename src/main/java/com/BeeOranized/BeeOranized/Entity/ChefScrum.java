@@ -34,38 +34,6 @@ public class ChefScrum extends User {
     @Column(name = "chefScrumGender")
     private String chefScrumGender;
 
-    public String getChefScrumFirstName() {
-        return chefScrumFirstName;
-    }
-
-    public void setChefScrumFirstName(String chefScrumFirstName) {
-        this.chefScrumFirstName = chefScrumFirstName;
-    }
-
-    public String getChefScrumLastName() {
-        return chefScrumLastName;
-    }
-
-    public void setChefScrumLastName(String chefScrumLastName) {
-        this.chefScrumLastName = chefScrumLastName;
-    }
-
-    public String getChefScrumBirthDay() {
-        return chefScrumBirthDay;
-    }
-
-    public void setChefScrumBirthDay(String chefScrumBirthDay) {
-        this.chefScrumBirthDay = chefScrumBirthDay;
-    }
-
-    public String getChefScrumGender() {
-        return chefScrumGender;
-    }
-
-    public void setChefScrumGender(String chefScrumGender) {
-        this.chefScrumGender = chefScrumGender;
-    }
-
     public ChefScrum() {
         super();
     }

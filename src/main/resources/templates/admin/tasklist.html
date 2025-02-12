@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Liste des Utilisateurs</title>
+    <title>Liste des Projets</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -13,17 +13,26 @@
         .table th {
             background-color: #f8f9fa;
         }
-        .btn-primary, .btn-danger {
+
+        .btn-primary,
+        .btn-danger {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .btn-primary i, .btn-danger i {
+
+        .btn-primary i,
+        .btn-danger i {
             margin-right: 5px;
         }
+
         .no-record {
             color: #6c757d;
             text-align: center;
+        }
+
+        .card-body {
+            padding: 1.5rem;
         }
     </style>
 </head>
@@ -51,55 +60,69 @@
 <div class="flex-1 bg-white p-6">
     <!-- Page Header -->
     <div class="text-center mb-6">
-        <h1 class="text-3xl font-semibold">Liste des Utilisateurs</h1>
-        <p class="text-muted">Gérez les utilisateurs enregistrés dans le système.</p>
+        <h1 class="text-3xl font-semibold">Liste des Projets</h1>
+        <p class="text-muted">Gérez les projets enregistrés dans le système.</p>
     </div>
+    <form method="get" action="/tasklist" class="mb-4 d-flex">
+        <input type="text" name="title" th:value="${title}" placeholder="Rechercher par titre" class="form-control mr-2">
+        <input type="text" name="status" th:value="${status}" placeholder="Rechercher par statut" class="form-control mr-2">
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+    </form>
 
     <!-- Card Container -->
     <div class="card shadow-sm">
         <div class="card-body">
             <!-- Bouton Ajouter -->
             <div class="d-flex justify-content-end mb-4">
-                <a href="/signupVue" class="btn btn-primary">
-                    <i class="fas fa-user-plus"></i> Ajouter un utilisateur
+                <a href="/taskVue/new" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Ajouter un task
                 </a>
             </div>
 
-            <!-- Tableau des utilisateurs -->
-            <div th:switch="${listUsers}">
-                <!-- Cas: Aucun utilisateur -->
+            <!-- Tableau des projets -->
+            <div th:switch="${tasks}">
+                <!-- Cas: Aucun projet -->
                 <div th:case="null" class="no-record">
-                    <h4>Aucun utilisateur trouvé !</h4>
+                    <h4>Aucun projet trouvé !</h4>
                 </div>
 
-                <!-- Cas: Utilisateurs présents -->
+                <!-- Cas: Projets présents -->
                 <div th:case="*">
                     <table class="table table-hover table-bordered">
                         <thead class="thead-light">
                         <tr>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Ville</th>
-                            <th>Rôles</th>
+                            <th>title</th>
+                            <th>description</th>
+                            <th>assignedUser</th>
+                            <th>startDate</th>
+                            <th>endDate</th>
+                            <th>status</th>
+                            <th>project</th>
+
+
                             <th class="text-center">Modifier</th>
                             <th class="text-center">Supprimer</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="user : ${listUsers}">
-                            <td th:text="${user.name}"></td>
-                            <td th:text="${user.userEmail}"></td>
-                            <td th:text="${user.userCity}"></td>
-                            <td>
-                                <span th:each="role : ${user.roles}" th:text="${role.name}" class="badge badge-secondary mr-1"></span>
-                            </td>
+                        <tr th:each="task : ${tasks}">
+                            <td th:text="${task.title}"></td>
+                            <td th:text="${task.description}"></td>
+                            <td th:text="${task.assignedUser}"></td>
+                            <td th:text="${task.startDate}"></td>
+                            <td th:text="${task.endDate}"></td>
+                            <td th:text="${task.status}"></td>
+                            <td th:text="${task.project.title}"></td>
+
+
+
                             <td class="text-center">
-                                <a th:href="@{/edit/{id}(id=${user.userId})}" class="btn btn-sm btn-primary">
+                                <a th:href="@{/taskVue/edit/{id}(id=${task.id})}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i> Modifier
                                 </a>
                             </td>
                             <td class="text-center">
-                                <a th:href="@{/deleteUser/{id}(id=${user.userId})}" class="btn btn-sm btn-danger">
+                                <a th:href="@{/taskVue/delete/{id}(id=${task.id})}" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash-alt"></i> Supprimer
                                 </a>
                             </td>

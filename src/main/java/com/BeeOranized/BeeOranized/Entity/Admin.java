@@ -34,37 +34,6 @@ public class Admin extends User {
     @Column(name = "adminGender")
     private String adminGender;
 
-    public String getAdminFirstName() {
-        return adminFirstName;
-    }
-
-    public void setAdminFirstName(String adminFirstName) {
-        this.adminFirstName = adminFirstName;
-    }
-
-    public String getAdminLastName() {
-        return adminLastName;
-    }
-
-    public void setAdminLastName(String adminLastName) {
-        this.adminLastName = adminLastName;
-    }
-
-    public String getAdminBirthDay() {
-        return adminBirthDay;
-    }
-
-    public void setAdminBirthDay(String adminBirthDay) {
-        this.adminBirthDay = adminBirthDay;
-    }
-
-    public String getAdminGender() {
-        return adminGender;
-    }
-
-    public void setAdminGender(String adminGender) {
-        this.adminGender = adminGender;
-    }
 
     public Admin() {
         super();

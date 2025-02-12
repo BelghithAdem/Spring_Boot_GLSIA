@@ -111,7 +111,4 @@ public class Project {
         return tasks;
     }
 
-    public void setTasks(Collection<Task> tasks) {
-        this.tasks = tasks;
-    }
 }

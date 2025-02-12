@@ -34,37 +34,6 @@ public class Membre extends User {
     @Column(name = "membreGender")
     private String membreGender;
 
-    public String getMembreFirstName() {
-        return membreFirstName;
-    }
-
-    public void setMembreFirstName(String membreFirstName) {
-        this.membreFirstName = membreFirstName;
-    }
-
-    public String getMembreLastName() {
-        return membreLastName;
-    }
-
-    public void setMembreLastName(String membreLastName) {
-        this.membreLastName = membreLastName;
-    }
-
-    public String getMembreBirthDay() {
-        return membreBirthDay;
-    }
-
-    public void setMembreBirthDay(String membreBirthDay) {
-        this.membreBirthDay = membreBirthDay;
-    }
-
-    public String getMembreGender() {
-        return membreGender;
-    }
-
-    public void setMembreGender(String membreGender) {
-        this.membreGender = membreGender;
-    }
 
     public Membre() {
         super();

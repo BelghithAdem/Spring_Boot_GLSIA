@@ -5,98 +5,63 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Inscription</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.3.3"></script> <!-- Pour améliorer la gestion des formulaires -->
 </head>
-<body class="h-screen flex bg-gray-100">
+<body class="bg-gray-100 h-screen flex">
 
 <!-- Sidebar -->
-<aside class="w-64 bg-blue-700 text-white flex flex-col shadow-lg">
-    <div class="p-6 text-center border-b border-blue-600">
-        <h1 class="text-2xl font-bold">Gestion App</h1>
+<aside class="w-64 bg-blue-600 text-white h-auto flex flex-col shadow-lg p-4">
+    <div class="text-center mb-6">
+        <h1 class="text-2xl font-semibold">Gestion App</h1>
     </div>
-    <nav class="flex-1 p-4 space-y-4">
-        <a href="/listuser" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
-            <span class="material-icons mr-3">group</span> Gestion des Utilisateurs
-        </a>
-        <a href="/projects" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
-            <span class="material-icons mr-3">folder</span> Gestion des Projets
-        </a>
-        <a href="/tasks" class="flex items-center p-3 rounded hover:bg-blue-600 transition">
-            <span class="material-icons mr-3">check_circle</span> Gestion des Tâches
-        </a>
+    <nav class="flex-1 space-y-4">
+        <a href="/listuser" class="block py-2 px-4 rounded-md text-white hover:bg-blue-500 transition duration-200">Gestion des Utilisateurs</a>
+        <a href="/projectList" class="block py-2 px-4 rounded-md text-white hover:bg-blue-500 transition duration-200">Gestion des Projets</a>
+        <a href="/tasklist" class="block py-2 px-4 rounded-md text-white hover:bg-blue-500 transition duration-200">Gestion des Tâches</a>
     </nav>
 </aside>
 
-<!-- Form Section -->
-<div class="flex-1 flex items-center justify-center">
-    <div class="w-full max-w-md bg-white shadow-md rounded-lg p-8 space-y-6">
-        <h2 class="text-2xl font-bold text-center text-gray-700">Formulaire d'Inscription</h2>
+<!-- Formulaire -->
+<div class="w-full max-w-md bg-white shadow-lg rounded-lg p-8 space-y-6 mx-auto my-auto">
+    <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">Formulaire d'Inscription</h2>
 
-        <!-- Formulaire d'inscription -->
-        <form th:action="@{/signupVue}" th:object="${message}" method="post" class="space-y-6">
-            <div>
-                <label for="userEmail" class="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                        type="email"
-                        id="userEmail"
-                        name="userEmail"
-                        placeholder="Votre email"
-                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required />
-            </div>
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Nom Complet</label>
-                <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Votre nom complet"
-                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required />
-            </div>
-            <div>
-                <label for="userPassword" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
-                <input
-                        type="password"
-                        id="userPassword"
-                        name="userPassword"
-                        placeholder="Votre mot de passe"
-                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required />
-            </div>
-            <div>
-                <label for="userCity" class="block text-sm font-medium text-gray-700">Ville</label>
-                <input
-                        type="text"
-                        id="userCity"
-                        name="userCity"
-                        placeholder="Votre ville"
-                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required />
-            </div>
-            <div>
-                <label for="userRole" class="block text-sm font-medium text-gray-700">Rôle</label>
-                <select
-                        id="userRole"
-                        name="userRole"
-                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
-                    <option value="Membre_ROLE">Membre</option>
-                    <option value="ChefScrum_ROLE">Chef Scrum</option>
-                    <option value="ADMIN_ROLE">Admin</option>
-                </select>
-            </div>
-            <button
-                    type="submit"
-                    class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition">
-                S'inscrire
-            </button>
+    <!-- Formulaire d'inscription -->
+    <form th:action="@{/signupVue}" th:object="${message}" method="post" class="space-y-6">
+        <div>
+            <label for="userEmail" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="userEmail" name="userEmail" placeholder="Email" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required />
+        </div>
 
-            <p class="text-center text-sm text-gray-500 mt-4">
-                Déjà un compte ? <a href="/signinVue" class="text-blue-500 hover:underline">Connectez-vous</a>
-            </p>
-        </form>
-    </div>
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Nom Complet</label>
+            <input type="text" id="name" name="name" placeholder="Nom Complet" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required />
+        </div>
+
+        <div>
+            <label for="userPassword" class="block text-sm font-medium text-gray-700">Mot de Passe</label>
+            <input type="password" id="userPassword" name="userPassword" placeholder="Mot de Passe" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required />
+        </div>
+
+        <div>
+            <label for="userCity" class="block text-sm font-medium text-gray-700">Ville</label>
+            <input type="text" id="userCity" name="userCity" placeholder="Ville" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required />
+        </div>
+
+        <div>
+            <label for="userRole" class="block text-sm font-medium text-gray-700">Rôle</label>
+            <select id="userRole" name="userRole" class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required>
+                <option value="Membre_ROLE">Membre</option>
+                <option value="ChefScrum_ROLE">Chef Scrum</option>
+                <option value="ADMIN_ROLE">Admin</option>
+            </select>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-200">S'inscrire</button>
+
+        <p class="text-center text-sm text-gray-500 mt-4">
+            Vous avez déjà un compte ? <a href="/signinVue" class="text-blue-600 hover:underline">Se connecter</a>
+        </p>
+    </form>
 </div>
 
 </body>

@@ -39,14 +39,20 @@
 
 <body class="bg-gray-100 h-screen flex">
 <!-- Sidebar -->
-<aside class="w-64 bg-blue-600 text-white h-full flex flex-col shadow-lg">
+<aside class="w-64 bg-blue-600 text-white h-auto flex flex-col shadow-lg">
     <div class="p-4 text-center border-b border-blue-500">
         <h1 class="text-2xl font-bold">Gestion App</h1>
     </div>
     <nav class="flex-1 p-4 space-y-4">
-        <a href="/listuser" class="block p-2 rounded hover:bg-blue-500">Gestion des Utilisateurs</a>
-        <a href="/projectList" class="block p-2 rounded hover:bg-blue-500">Gestion des Projets</a>
-        <a href="/tasks" class="block p-2 rounded hover:bg-blue-500">Gestion des Tâches</a>
+        <a href="/listuser" class="block p-2 rounded hover:bg-blue-500">
+            Gestion des Utilisateurs
+        </a>
+        <a href="/projectList" class="block p-2 rounded hover:bg-blue-500">
+            Gestion des Projets
+        </a>
+        <a href="/tasklist" class="block p-2 rounded hover:bg-blue-500">
+            Gestion des Tâches
+        </a>
     </nav>
 </aside>
 
@@ -104,7 +110,7 @@
 
 
                             <td class="text-center">
-                                <a th:href="@{/projectVue/update/{id}(id=${project.id})}" class="btn btn-sm btn-primary">
+                                <a th:href="@{/projectVue/edit/{id}(id=${project.id})}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i> Modifier
                                 </a>
                             </td>

@@ -17,7 +17,6 @@ import java.util.*;
 @RestController
 public class UserService {
 
-
     @Autowired
     PasswordEncoder encoder;
     @Autowired
@@ -28,15 +27,13 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private  RoleRepository roleRepository;
+    private RoleRepository roleRepository;
     @Autowired
-    private  MembreRepository membreRepository;
+    private MembreRepository membreRepository;
     @Autowired
-    private  ChefScrumRepository chefScrumRepository;
+    private ChefScrumRepository chefScrumRepository;
     @Autowired
-    private  AdminRepository adminRepository;
-
-
+    private AdminRepository adminRepository;
 
     public String generateResetPasswordToken(User user) {
         User existingUser = userRepository.findByUserEmail(user.getUserEmail()).orElse(null);
@@ -87,9 +84,6 @@ public class UserService {
         }
     }
 
-
-
-
     public UserDataDTO getUserDataByEmail(String email) {
         Optional<User> userOptional = userRepository.findByUserEmail(email);
         if (userOptional.isPresent()) {
@@ -133,6 +127,7 @@ public class UserService {
         user.setRoles(userDetails.getRoles());
         return userRepository.save(user);
     }
+
     public List<User> getAllScrumMasters() {
         // Find the role for ChefScrum_ROLE
         Optional<Role> chefScrumRoleOpt = roleRepository.findByName(ERole.ChefScrum_ROLE);
@@ -145,17 +140,31 @@ public class UserService {
             return Collections.emptyList(); // Return an empty list if the role doesn't exist
         }
     }
+
+    public List<User> getAllMembers() {
+        // Find the role for ChefScrum_ROLE
+        Optional<Role> memberRoleOpt = roleRepository.findByName(ERole.Membre_ROLE);
+
+        // If the role exists, fetch all users who have this role
+        if (memberRoleOpt.isPresent()) {
+            Role memberRole = memberRoleOpt.get();
+            return userRepository.findByRolesContaining(memberRole); // Assuming the `UserRepository` has this method
+        } else {
+            return Collections.emptyList(); // Return an empty list if the role doesn't exist
+        }
+    }
+
     public String registerUser(SignupRequestDto signUpRequest, Model model) {
         try {
             if (userRepository.existsByUserEmail(signUpRequest.getUserEmail())) {
                 model.addAttribute("message", "Erreur : L'email est déjà pris !");
-                return "register";
+                return "admin/register";
             }
 
             Set<Role> roles = new HashSet<>();
             Role userRole = assignUserRole(signUpRequest.getUserRole(), model);
             if (userRole == null) {
-                return "register";
+                return "admin/register";
             }
 
             roles.add(userRole);
@@ -163,11 +172,11 @@ public class UserService {
             User newUser = createUser(signUpRequest, roles);
 
             model.addAttribute("message", "Utilisateur enregistré avec succès !");
-            return "login";
+            return "redirect:/listuser";
 
         } catch (Exception e) {
             model.addAttribute("message", "Une erreur inattendue s'est produite. Veuillez réessayer.");
-            return "register";
+            return "admin/register";
         }
     }
 
@@ -196,7 +205,6 @@ public class UserService {
             return "admin/register";
         }
     }
-
 
     private Role assignUserRole(String userRoleStr, Model model) {
         Optional<Role> roleOpt;
@@ -237,7 +245,5 @@ public class UserService {
                 throw new IllegalArgumentException("Invalid role provided.");
         }
     }
-
-
 
 }
