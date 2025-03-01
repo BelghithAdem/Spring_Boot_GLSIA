@@ -1,14 +1,14 @@
 package com.BeeOranized.BeeOranized.ControllerVue;
-import com.BeeOranized.BeeOranized.Dtos.JwtResponseDto;
 import com.BeeOranized.BeeOranized.Dtos.LoginRequestDto;
 import com.BeeOranized.BeeOranized.Dtos.SignupRequestDto;
 import com.BeeOranized.BeeOranized.Entity.User;
 import com.BeeOranized.BeeOranized.Repository.UserRepository;
 import com.BeeOranized.BeeOranized.Securit.service.UserDetailsImpl;
 import com.BeeOranized.BeeOranized.Security.jwt.JwtUtils;
+import com.BeeOranized.BeeOranized.Strategy.AuthContext;
+import com.BeeOranized.BeeOranized.Strategy.JwtAuthStrategy;
 import com.BeeOranized.BeeOranized.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Controller
 public class AuthControllerVue {
+    private final AuthContext authContext;
+    private final JwtAuthStrategy jwtAuthStrategy;
 
     private final UserService userService;
 
@@ -36,52 +38,16 @@ public class AuthControllerVue {
     private UserRepository userRepository;
 
     @Autowired
-    public AuthControllerVue(UserService userService) {
+    public AuthControllerVue(AuthContext authContext, JwtAuthStrategy jwtAuthStrategy, UserService userService) {
+        this.authContext = authContext;
+        this.jwtAuthStrategy = jwtAuthStrategy;
         this.userService = userService;
     }
 
-    // Authentifier l'utilisateur et renvoyer une réponse JWT
     @RequestMapping("/signinVue")
     public String authenticateUser(@ModelAttribute LoginRequestDto loginRequest, Model model) {
-        try {
-            System.out.println("Authenticating user: " + loginRequest.getUserEmail());
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUserEmail(), loginRequest.getUserPassword()));
-
-            System.out.println("Authentication successful");
-
-            // Enregistrement de l'authentification dans le contexte de sécurité
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
-
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(item -> item.getAuthority())
-                    .collect(Collectors.toList());
-
-            // Ajouter les données à la vue
-            model.addAttribute("userEmail", loginRequest.getUserEmail());
-            model.addAttribute("roles", roles);
-            model.addAttribute("jwt", jwt);
-            System.out.println("User roles: " + roles.contains("ROLE_ADMIN"));
-            // Rediriger vers le template "login" après une authentification réussie
-            if (roles.contains("ADMIN_ROLE")) {
-                return "redirect:/listuser";
-            } else if (roles.contains("ChefScrum_ROLE")) {
-                return "scrummaster/index";  // Rediriger vers la page Scrum Master
-            } else if (roles.contains("Membre_ROLE")) {
-                return "/member/index";  // Rediriger vers la page Member
-            } else {
-                // Par défaut, rediriger vers la page d'accueil ou une page d'erreur
-                return "login";  // Par exemple, vers la page d'accueil
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // Affiche l'exception complète dans les logs
-            model.addAttribute("error", "Invalid email or password");
-
-            // Retourner à la page de connexion avec un message d'erreur
-            return "login"; // Afficher la vue de connexion avec l'erreur
-        }
+        authContext.setAuthStrategy(jwtAuthStrategy);
+        return authContext.executeAuthentication(loginRequest, model);
     }
 
     // Inscription de l'utilisateur via le service
